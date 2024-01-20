@@ -54,7 +54,11 @@ defmodule ClarxCore.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.18", only: [:dev, :test], runtime: false}
+      {:excoveralls, "~> 0.18", only: [:dev, :test], runtime: false},
+      {:tzdata, "~> 1.1"},
+      {:argon2_elixir, "~> 4.0"},
+      {:joken, "~> 2.6"},
+      {:faker, "~> 0.17", only: [:dev, :test], runtime: false}
     ]
   end
 
