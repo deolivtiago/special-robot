@@ -13,11 +13,11 @@ config :clarx,
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint
-config :clarx, ClarxCoreWeb.Endpoint,
+config :clarx, ClarxWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Phoenix.Endpoint.Cowboy2Adapter,
   render_errors: [
-    formats: [json: ClarxCoreWeb.ErrorJSON],
+    formats: [json: ClarxWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: ClarxCore.PubSub,

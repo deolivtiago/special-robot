@@ -1,11 +1,11 @@
-defmodule ClarxCoreWeb.Gettext do
+defmodule ClarxWeb.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.
 
   By using [Gettext](https://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:
 
-      import ClarxCoreWeb.Gettext
+      import ClarxWeb.Gettext
 
       # Simple translation
       gettext("Here is the string to translate")

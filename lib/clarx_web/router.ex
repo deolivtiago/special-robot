@@ -1,11 +1,11 @@
-defmodule ClarxCoreWeb.Router do
-  use ClarxCoreWeb, :router
+defmodule ClarxWeb.Router do
+  use ClarxWeb, :router
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/api", ClarxCoreWeb do
+  scope "/api", ClarxWeb do
     pipe_through :api
   end
 

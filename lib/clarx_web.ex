@@ -1,12 +1,12 @@
-defmodule ClarxCoreWeb do
+defmodule ClarxWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use ClarxCoreWeb, :controller
-      use ClarxCoreWeb, :html
+      use ClarxWeb, :controller
+      use ClarxWeb, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -39,10 +39,10 @@ defmodule ClarxCoreWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: ClarxCoreWeb.Layouts]
+        layouts: [html: ClarxWeb.Layouts]
 
       import Plug.Conn
-      import ClarxCoreWeb.Gettext
+      import ClarxWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -51,9 +51,9 @@ defmodule ClarxCoreWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: ClarxCoreWeb.Endpoint,
-        router: ClarxCoreWeb.Router,
-        statics: ClarxCoreWeb.static_paths()
+        endpoint: ClarxWeb.Endpoint,
+        router: ClarxWeb.Router,
+        statics: ClarxWeb.static_paths()
     end
   end
 

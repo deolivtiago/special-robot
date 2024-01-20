@@ -8,7 +8,7 @@ defmodule ClarxCore.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      ClarxCoreWeb.Telemetry,
+      ClarxWeb.Telemetry,
       ClarxCore.Repo,
       {DNSCluster, query: Application.get_env(:clarx, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ClarxCore.PubSub},
@@ -17,7 +17,7 @@ defmodule ClarxCore.Application do
       # Start a worker by calling: ClarxCore.Worker.start_link(arg)
       # {ClarxCore.Worker, arg},
       # Start to serve requests, typically the last entry
-      ClarxCoreWeb.Endpoint
+      ClarxWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -30,7 +30,7 @@ defmodule ClarxCore.Application do
   # whenever the application is updated.
   @impl true
   def config_change(changed, _new, removed) do
-    ClarxCoreWeb.Endpoint.config_change(changed, removed)
+    ClarxWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

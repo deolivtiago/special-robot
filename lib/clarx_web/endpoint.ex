@@ -1,4 +1,4 @@
-defmodule ClarxCoreWeb.Endpoint do
+defmodule ClarxWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :clarx
 
   # The session will be stored in the cookie and signed,
@@ -21,7 +21,7 @@ defmodule ClarxCoreWeb.Endpoint do
     at: "/",
     from: :clarx,
     gzip: false,
-    only: ClarxCoreWeb.static_paths()
+    only: ClarxWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -41,5 +41,5 @@ defmodule ClarxCoreWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug ClarxCoreWeb.Router
+  plug ClarxWeb.Router
 end

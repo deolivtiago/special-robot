@@ -15,7 +15,7 @@ config :clarx, ClarxCore.Repo,
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :clarx, ClarxCoreWeb.Endpoint,
+config :clarx, ClarxWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "23/DiB0D/W/xNCnDZOcNZIAxzRRQKMfH78vnLlH+ydLq42HiLuUqfeJFOwXyZXCh",
   server: false
