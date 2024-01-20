@@ -1,0 +1,17 @@
+{
+  "skip_files": [
+    "test",
+    "lib/clarx_core/application.ex",
+    "lib/clarx_web.ex",
+    "lib/clarx_web/router.ex",
+    "lib/clarx_web/telemetry.ex",
+    "lib/clarx_web/views/error_json.ex"
+  ],
+  "terminal_options": {
+    "file_column_width": 80
+  },
+  "coverage_options": {
+    "treat_no_relevant_lines_as_covered": true,
+    "minimum_coverage": 75
+  }
+}
