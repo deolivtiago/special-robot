@@ -32,6 +32,9 @@ config :clarx, ClarxWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :clarx, ClarxCore.Mailer, adapter: Swoosh.Adapters.Local
 
+# Configures the database timezone
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
