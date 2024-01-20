@@ -1,0 +1,77 @@
+name: ci
+
+on:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    services:
+      postgres:
+        image: postgres:latest
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup elixir
+        uses: erlef/setup-beam@v1
+        id: beam
+        with:
+          elixir-version: "1.15"
+          otp-version: "26.0"
+
+      - name: Get cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: >-
+            ${{ runner.os }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-${{ hashFiles('**/mix.lock') }}
+      - name: Get dependencies
+        run: mix do deps.get, deps.compile
+
+      - name: Check unused deps
+        run: mix deps.unlock --check-unused
+
+      - name: Compile code
+        run: mix compile --warnings-as-errors
+
+      - name: Check formatting
+        run: mix format --check-formatted
+
+      - name: Analyze code
+        run: mix credo --strict
+
+      - name: Setup database
+        run: mix setup
+
+      - name: Run tests
+        run: mix test
+
+      - name: Run coveralls
+        run: mix coveralls.github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
