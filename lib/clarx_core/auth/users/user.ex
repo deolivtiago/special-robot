@@ -7,6 +7,7 @@ defmodule ClarxCore.Auth.Users.User do
   import Ecto.Changeset
 
   alias __MODULE__
+  alias ClarxCore.Auth.UserTokens.UserToken
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -20,9 +21,10 @@ defmodule ClarxCore.Auth.Users.User do
     field :last_name, :string, default: ""
     field :email, :string
     field :password, :string, redact: true
-
     field :role, Ecto.Enum, values: ~w(user admin)a, default: :user
     field :confirmed_at, :utc_datetime
+
+    has_many :users, UserToken
 
     timestamps(type: :utc_datetime)
   end
