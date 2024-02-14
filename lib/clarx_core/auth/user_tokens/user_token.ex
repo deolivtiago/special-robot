@@ -88,6 +88,10 @@ defmodule ClarxCore.Auth.UserTokens.UserToken do
     end
   end
 
+  def validate_token(token, _typ) do
+    {:error, [message: "Invalid token", token: "format", token_val: token]}
+  end
+
   add_hook(Joken.Hooks.RequiredClaims, ~w(jti typ sub exp)a)
 
   @impl true

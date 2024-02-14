@@ -184,15 +184,15 @@ defmodule ClarxCore.Auth.UserTokens.UserTokenTest do
     end
   end
 
-  describe "generate_token/2 returns" do
-    test "ok when sub and typ are valid" do
+  describe "generate_token/2" do
+    test "returns ok when sub and typ are valid" do
       sub = Ecto.UUID.generate()
 
       for typ <- ~w(access refresh confirm_account change_email reset_password),
           do: assert({:ok, _token, %{"typ" => ^typ}} = UserToken.generate_token(sub, typ))
     end
 
-    test "error when sub or typ are invalid" do
+    test "raises an error when sub or typ are invalid" do
       sub = Ecto.UUID.generate()
 
       assert_raise FunctionClauseError, fn -> UserToken.generate_token(1, "access") end
