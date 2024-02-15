@@ -6,14 +6,10 @@ defmodule ClarxCore.Auth.Users.User do
 
   import Ecto.Changeset
 
-  alias __MODULE__
   alias ClarxCore.Auth.UserTokens.UserToken
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-
-  @required_attrs ~w(first_name email password)a
-  @optional_attrs ~w(last_name avatar_url role confirmed_at)a
 
   schema "users" do
     field :avatar_url, :string, default: ""
@@ -29,11 +25,13 @@ defmodule ClarxCore.Auth.Users.User do
     timestamps(type: :utc_datetime)
   end
 
-  @doc false
-  def changeset(%User{} = user, attrs \\ %{}) do
+  def changeset(user, attrs \\ %{}) do
+    required_attrs = ~w(first_name email password)a
+    optional_attrs = ~w(last_name avatar_url role confirmed_at)a
+
     user
-    |> cast(attrs, @required_attrs ++ @optional_attrs)
-    |> validate_required(@required_attrs)
+    |> cast(attrs, required_attrs ++ optional_attrs)
+    |> validate_required(required_attrs)
     |> unique_constraint(:id, name: :users_pkey)
     |> unique_constraint(:email)
     |> update_change(:avatar_url, &String.downcase/1)
@@ -52,24 +50,13 @@ defmodule ClarxCore.Auth.Users.User do
     |> update_change(:password, &Argon2.hash_pwd_salt/1)
   end
 
-  @doc """
-  Validates user credentials
+  def credentials_changeset(credentials \\ %{}) do
+    types = %{email: :string, password: :string}
 
-  ## Examples
-
-      iex> validate_credentials(valid_credentials)
-      {:ok, %User{}}
-
-      iex> validate_credentials(invalid_credentials)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def validate_credentials(credentials \\ %{}) do
-    %User{}
-    |> cast(credentials, ~w(email password)a)
-    |> validate_required(~w(email password)a)
+    {%{}, types}
+    |> cast(credentials, Map.keys(types))
+    |> validate_required(Map.keys(types))
     |> update_change(:email, &String.downcase/1)
     |> validate_format(:email, ~r/^[.!?@#$%^&*_+a-z\-0-9]+[@][._+\-a-z0-9]+$/)
-    |> apply_action(:validate)
   end
 end
