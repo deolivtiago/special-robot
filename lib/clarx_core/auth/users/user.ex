@@ -12,9 +12,6 @@ defmodule ClarxCore.Auth.Users.User do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  @required_attrs ~w(first_name email password)a
-  @optional_attrs ~w(last_name avatar_url role confirmed_at)a
-
   schema "users" do
     field :avatar_url, :string, default: ""
     field :first_name, :string
@@ -24,16 +21,19 @@ defmodule ClarxCore.Auth.Users.User do
     field :role, Ecto.Enum, values: ~w(user admin)a, default: :user
     field :confirmed_at, :utc_datetime
 
-    has_many :users, UserToken
+    has_many :user_tokens, UserToken
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(%User{} = user, attrs \\ %{}) do
+  def changeset(user, attrs) when is_map(attrs) do
+    required_attrs = ~w(first_name email password)a
+    optional_attrs = ~w(last_name avatar_url role confirmed_at)a
+
     user
-    |> cast(attrs, @required_attrs ++ @optional_attrs)
-    |> validate_required(@required_attrs)
+    |> cast(attrs, required_attrs ++ optional_attrs)
+    |> validate_required(required_attrs)
     |> unique_constraint(:id, name: :users_pkey)
     |> unique_constraint(:email)
     |> update_change(:avatar_url, &String.downcase/1)

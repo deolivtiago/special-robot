@@ -45,4 +45,9 @@ defmodule ClarxWeb.UserController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  @doc false
+  def me(%{assigns: %{current_user: user}} = conn, _params) do
+    render(conn, :show, user: user)
+  end
 end
