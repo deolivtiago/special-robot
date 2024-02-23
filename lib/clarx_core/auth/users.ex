@@ -3,7 +3,7 @@ defmodule ClarxCore.Auth.Users do
   Auth.Users context
   """
 
-  alias ClarxCore.Auth.Users.User
+  alias ClarxCore.Auth.Users.Services
 
   @doc """
   Lists all users
@@ -14,7 +14,7 @@ defmodule ClarxCore.Auth.Users do
       [%User{}, ...]
 
   """
-  defdelegate list_users, to: User.List, as: :call
+  defdelegate list_users, to: Services.ListUsers, as: :call
 
   @doc """
   Gets an user
@@ -28,7 +28,7 @@ defmodule ClarxCore.Auth.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate get_user(field, value), to: User.Get, as: :call
+  defdelegate get_user(field, value), to: Services.GetUser, as: :call
 
   @doc """
   Inserts an user
@@ -42,7 +42,7 @@ defmodule ClarxCore.Auth.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate insert_user(attrs), to: User.Insert, as: :call
+  defdelegate insert_user(attrs), to: Services.InsertUser, as: :call
 
   @doc """
   Updates an user
@@ -56,7 +56,7 @@ defmodule ClarxCore.Auth.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate update_user(user, attrs), to: User.Update, as: :call
+  defdelegate update_user(user, attrs), to: Services.UpdateUser, as: :call
 
   @doc """
   Deletes an user
@@ -70,7 +70,7 @@ defmodule ClarxCore.Auth.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate delete_user(user), to: User.Delete, as: :call
+  defdelegate delete_user(user), to: Services.DeleteUser, as: :call
 
   @doc """
   Authenticates an user
@@ -84,5 +84,5 @@ defmodule ClarxCore.Auth.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate authenticate_user(credentials), to: User.Authenticate, as: :call
+  defdelegate authenticate_user(credentials), to: Services.AuthenticateUser, as: :call
 end

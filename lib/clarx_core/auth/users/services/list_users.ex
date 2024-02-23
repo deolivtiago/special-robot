@@ -1,4 +1,4 @@
-defmodule ClarxCore.Auth.Users.User.List do
+defmodule ClarxCore.Auth.Users.Services.ListUsers do
   @moduledoc false
 
   alias ClarxCore.Auth.Users.User

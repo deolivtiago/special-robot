@@ -185,26 +185,4 @@ defmodule ClarxCore.Auth.Users.UserTest do
       assert Enum.member?(errors.password, "must have at least 1 symbol")
     end
   end
-
-  describe "validate_credentials/1 returns" do
-    test "ok when credentials are valid" do
-      credentials = %{email: "some@mail.com", password: "secret"}
-
-      assert {:ok, user} = User.validate_credentials(credentials)
-
-      assert user.email == credentials.email
-      assert user.password == credentials.password
-    end
-
-    test "error when credentials are invalid" do
-      credentials = %{email: "invalid_email", password: nil}
-
-      assert {:error, changeset} = User.validate_credentials(credentials)
-      errors = errors_on(changeset)
-
-      assert %Changeset{valid?: false} = changeset
-      assert Enum.member?(errors.email, "has invalid format")
-      assert Enum.member?(errors.password, "can't be blank")
-    end
-  end
 end

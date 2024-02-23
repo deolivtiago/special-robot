@@ -86,15 +86,15 @@ defmodule ClarxCore.Auth.UsersTest do
       assert user.first_name == attrs.first_name
       assert user.last_name == attrs.last_name
       assert user.email == attrs.email
-      assert user.role == attrs.role
-      assert user.confirmed_at == attrs.confirmed_at
+      assert user.role == :user
+      assert user.confirmed_at == nil
       assert Argon2.verify_pass(attrs.password, user.password)
     end
   end
 
   describe "insert_user/1 returns error" do
     test "when the user attributes are invalid" do
-      attrs = %{email: "???", first_name: nil, confirmed_at: 1, password: "?", role: "invalid"}
+      attrs = %{email: "???", first_name: nil, password: "?"}
 
       assert {:error, changeset} = Users.insert_user(attrs)
       errors = errors_on(changeset)
@@ -103,8 +103,6 @@ defmodule ClarxCore.Auth.UsersTest do
       assert Enum.member?(errors.first_name, "can't be blank")
       assert Enum.member?(errors.email, "has invalid format")
       assert Enum.member?(errors.password, "should be at least 8 character(s)")
-      assert Enum.member?(errors.role, "is invalid")
-      assert Enum.member?(errors.confirmed_at, "is invalid")
     end
 
     test "when the user email already exists", %{attrs: attrs} do
@@ -122,6 +120,8 @@ defmodule ClarxCore.Auth.UsersTest do
     setup [:insert_user]
 
     test "when the user attributes are valid", %{user: %{id: id} = user, attrs: attrs} do
+      attrs = Map.delete(attrs, :password)
+
       assert {:ok, %User{} = user} = Users.update_user(user, attrs)
 
       assert id == user.id
@@ -130,7 +130,6 @@ defmodule ClarxCore.Auth.UsersTest do
       assert attrs.last_name == user.last_name
       assert attrs.role == user.role
       assert attrs.confirmed_at == user.confirmed_at
-      assert Argon2.verify_pass(attrs.password, user.password)
     end
   end
 
@@ -146,7 +145,7 @@ defmodule ClarxCore.Auth.UsersTest do
       assert %Changeset{valid?: false} = changeset
       assert Enum.member?(errors.first_name, "can't be blank")
       assert Enum.member?(errors.email, "has invalid format")
-      assert Enum.member?(errors.password, "must have at least 1 number")
+      assert Enum.member?(errors.password, "must be updated by reset")
       assert Enum.member?(errors.role, "is invalid")
       assert Enum.member?(errors.confirmed_at, "is invalid")
     end

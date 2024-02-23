@@ -1,4 +1,4 @@
-defmodule ClarxCore.Auth.Users.User.Delete do
+defmodule ClarxCore.Auth.Users.Services.DeleteUser do
   @moduledoc false
 
   alias ClarxCore.Auth.Users.User
