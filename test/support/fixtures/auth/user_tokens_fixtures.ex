@@ -23,9 +23,11 @@ defmodule ClarxCore.Auth.UserTokensFixtures do
       |> Ecto.Enum.values(:type)
       |> Enum.random()
 
+    token = Enum.random(000_000..999_999) |> Integer.to_string()
+
     Map.new()
     |> Map.put(:id, Faker.UUID.v4())
-    |> Map.put(:token, Faker.random_bytes(6))
+    |> Map.put(:token, token)
     |> Map.put(:type, type)
     |> Map.put(:user, user)
     |> Map.put(:user_id, user.id)

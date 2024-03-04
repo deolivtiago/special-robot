@@ -15,6 +15,7 @@ defmodule ClarxCore.Auth.UserTokens.UserToken.Get do
 
     query
     |> Repo.get_by!(%{id: id})
+    |> Repo.preload(:user)
     |> then(&{:ok, &1})
   rescue
     Ecto.Query.CastError ->

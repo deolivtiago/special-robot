@@ -1,6 +1,6 @@
 defmodule ClarxCore.Auth.UserTokens.UserToken do
   @moduledoc """
-  Database schema for user tokens
+  User token schema
   """
   use Ecto.Schema
 
@@ -20,7 +20,8 @@ defmodule ClarxCore.Auth.UserTokens.UserToken do
     field :expiration, :utc_datetime
 
     field :type, Ecto.Enum,
-      values: ~w(access refresh confirm_account reset_password change_email)a
+      values: ~w(access refresh code)a,
+      default: :code
 
     belongs_to :user, User
 
@@ -29,17 +30,35 @@ defmodule ClarxCore.Auth.UserTokens.UserToken do
 
   @doc false
   def changeset(attrs) when is_map(attrs) do
-    required_attrs = ~w(id token expiration type user_id)a
+    required_attrs = ~w(user_id)a
+    optional_attrs = ~w(id token expiration type)a
 
-    %UserToken{}
-    |> cast(attrs, required_attrs)
+    %UserToken{expiration: DateTime.add(DateTime.utc_now(:second), 10, :minute)}
+    |> cast(attrs, required_attrs ++ optional_attrs)
     |> validate_required(required_attrs)
+    |> unique_constraint(:id, name: :user_tokens_pkey)
     |> update_change(:id, &String.downcase/1)
     |> validate_format(:id, @valid_uuid)
-    |> unique_constraint(:id, name: :user_tokens_pkey)
     |> update_change(:user_id, &String.downcase/1)
     |> validate_format(:user_id, @valid_uuid)
     |> unique_constraint(:token)
     |> assoc_constraint(:user)
+    |> validate_condition(:type, &auth_token_type?/1, &validate_required(&1, optional_attrs))
+    |> validate_condition(:type, &code_token_type?/1, &put_change(&1, :token, generate_code()))
   end
+
+  defp validate_condition(changeset, key, cond_func, do_func) do
+    field = fetch_field!(changeset, key)
+
+    if cond_func.(field) do
+      do_func.(changeset)
+    else
+      changeset
+    end
+  end
+
+  defp auth_token_type?(type), do: Enum.member?(~w(access refresh)a, type)
+  defp code_token_type?(type), do: match?(:code, type)
+
+  defp generate_code, do: Enum.random(000_000..999_999) |> Integer.to_string()
 end

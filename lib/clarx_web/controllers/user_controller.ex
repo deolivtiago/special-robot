@@ -2,6 +2,7 @@ defmodule ClarxWeb.UserController do
   @moduledoc false
   use ClarxWeb, :controller
 
+  alias ClarxCore.Auth.UserTokens
   alias ClarxCore.Auth.Users
 
   action_fallback ClarxWeb.FallbackController
@@ -44,5 +45,10 @@ defmodule ClarxWeb.UserController do
          {:ok, _user} <- Users.delete_user(user) do
       send_resp(conn, :no_content, "")
     end
+  end
+
+  @doc false
+  def me(%{assigns: %{current_user: user}} = conn, _params) do
+    render(conn, :show, user: user)
   end
 end
