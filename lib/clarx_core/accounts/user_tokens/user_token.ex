@@ -8,6 +8,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserToken do
 
   alias __MODULE__
 
+  alias ClarxCore.Accounts.JwtTokens.JwtToken
   alias ClarxCore.Accounts.Users.User
 
   @valid_uuid ~r/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
@@ -27,7 +28,27 @@ defmodule ClarxCore.Accounts.UserTokens.UserToken do
     timestamps(updated_at: false)
   end
 
-  @doc false
+  # @doc false
+  # def changeset(%OtpToken{id: id, token: token, email: email, expiration: expiration}) do
+  #   Map.new()
+  #   |> Map.put(:id, id)
+  #   |> Map.put(:token, token)
+  #   |> Map.put(:email, email)
+  #   |> Map.put(:type, :verify)
+  #   |> Map.put(:expiration, expiration)
+  #   |> changeset()
+  # end
+
+  def changeset(%JwtToken{token: token, claims: claims}) do
+    Map.new()
+    |> Map.put(:token, token)
+    |> Map.put(:id, Map.fetch!(claims, :jti))
+    |> Map.put(:type, Map.fetch!(claims, :typ))
+    |> Map.put(:user_id, Map.fetch!(claims, :sub))
+    |> Map.put(:expiration, DateTime.from_unix!(Map.fetch!(claims, :exp), :second))
+    |> changeset()
+  end
+
   def changeset(attrs) when is_map(attrs) do
     required_attrs = ~w(id token expiration type user_id)a
 

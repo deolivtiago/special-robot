@@ -14,8 +14,13 @@ defmodule ClarxWeb.Router do
 
     post "/signup", AuthController, :signup
     post "/signin", AuthController, :signin
-    post "/signout", AuthController, :signout
-    post "/refresh", AuthController, :refresh
+    delete "/signout", AuthController, :signout
+
+    post "/renew", AuthController, :renew
+    post "/reset", AuthController, :reset
+
+    post "/code/send", AuthController, :send_code
+    get "/code/revoke", AuthController, :revoke_code
   end
 
   scope "/api", ClarxWeb do

@@ -44,9 +44,9 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     end
   end
 
-  describe "create_user_token/1 returns ok" do
+  describe "create_user_token/2 returns ok" do
     test "when the user attributes are valid", %{attrs: attrs} do
-      assert {:ok, %UserToken{} = user_token} = UserTokens.create_user_token(attrs)
+      assert {:ok, %UserToken{} = user_token} = UserTokens.create_user_token(attrs.user, :access)
 
       assert user_token.token == attrs.token
       assert user_token.type == attrs.type
@@ -95,8 +95,8 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     end
   end
 
-  defp put_user_token(_) do
-    insert_user()
+  defp put_user_token(%{attrs: %{user: user}}) do
+    user
     |> insert_user_token()
     |> then(&{:ok, user_token: &1})
   end

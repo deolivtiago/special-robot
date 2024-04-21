@@ -4,7 +4,7 @@ defmodule ClarxWeb.Plugs.AuthenticationPlug do
   """
   import Plug.Conn
 
-  alias ClarxCore.Accounts.JwtTokens
+  alias ClarxCore.Accounts.UserTokens
 
   @doc false
   def init(opts), do: opts
@@ -29,7 +29,7 @@ defmodule ClarxWeb.Plugs.AuthenticationPlug do
     |> Enum.filter(&String.match?(&1, bearer_prefix))
     |> List.first("")
     |> String.replace(bearer_prefix, "")
-    |> JwtTokens.validate_jwt_token(type)
+    |> UserTokens.verify_user_token(type)
   end
 
   defp token_type(request_path) do

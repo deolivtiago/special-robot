@@ -5,7 +5,7 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken.Generate do
 
   @doc false
   def call(sub, typ) when is_atom(typ) do
-    extra_claims = build_extra_claims!(sub, typ)
+    extra_claims = build_extra_claims(sub, typ)
 
     case JwtToken.Signer.generate_and_sign(extra_claims) do
       {:ok, token, claims} ->
@@ -23,14 +23,21 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken.Generate do
     end
   end
 
-  defp build_extra_claims!(sub, typ) do
-    sub = Ecto.UUID.cast!(sub)
-    typ = Map.fetch!(typ_mappings(), typ)
-
+  defp build_extra_claims(sub, :refresh) do
     Map.new()
     |> Map.put("sub", sub)
-    |> Map.put("typ", typ)
+    |> Map.put("typ", "refresh")
+    |> Map.put(
+      "exp",
+      DateTime.utc_now(:second)
+      |> DateTime.add(14, :day)
+      |> DateTime.to_unix()
+    )
   end
 
-  defp typ_mappings, do: Ecto.Enum.mappings(JwtToken.Claims, :typ) |> Map.new()
+  defp build_extra_claims(sub, typ) do
+    Map.new()
+    |> Map.put("sub", sub)
+    |> Map.put("typ", Atom.to_string(typ))
+  end
 end

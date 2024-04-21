@@ -1,20 +1,29 @@
-defmodule ClarxCore.Accounts.JwtTokens.JwtToken do
+defmodule ClarxCore.Accounts.AuthTokens.AuthToken do
   @moduledoc """
-  JWT Token schema
+  Auth Token schema
   """
   use Ecto.Schema
 
   import Ecto.Changeset
 
+  alias ClarxCore.Accounts.AuthTokens.AuthToken.JwtToken
   alias __MODULE__
+
+  alias ClarxCore.Accounts.Users.User
 
   @valid_uuid ~r/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
-  @primary_key false
-  @timestamps_opts false
+  @primary_key {:id, :binary_id, autogenerate: false}
+  @foreign_key_type :binary_id
+  @timestamps_opts [type: :utc_datetime]
 
-  embedded_schema do
+  schema "auth_tokens" do
     field :token, :string
+    field :expiration, :utc_datetime
+
+    field :type, Ecto.Enum, values: ~w(access refresh)a
+
+    belongs_to :user, User
 
     embeds_one :claims, Claims, primary_key: {:jti, :binary_id, autogenerate: false} do
       field :sub, :string
@@ -27,16 +36,31 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken do
       field :iat, :integer
       field :nbf, :integer
     end
+
+    timestamps(updated_at: false)
+  end
+
+  def changeset(user, typ) when is_atom(typ), do: changeset(user, Atom.to_string(typ))
+
+  def changeset(%User{id: sub}, typ) when typ in ~w(access refresh) do
+    token = JwtToken.new!(sub, typ)
+
+    token
+    |> Map.from_struct()
+    |> Map.put(:user_id, token.sub)
+    |> changeset()
   end
 
   def changeset(attrs) when is_map(attrs) do
-    %JwtToken{}
-    |> cast(attrs, ~w(token)a)
-    |> validate_required(~w(token)a)
+    required_attrs = ~w(id token expiration type user_id)a
+
+    %AuthToken{}
+    |> cast(attrs, required_attrs)
+    |> validate_required(required_attrs)
     |> cast_embed(:claims, with: &claims_changeset/2, required: true)
   end
 
-  def claims_changeset(claims, attrs) when is_map(attrs) do
+  defp claims_changeset(claims, attrs) when is_map(attrs) do
     required_attrs = ~w(jti sub exp typ)a
     optional_attrs = ~w(iss aud iat nbf)a
 

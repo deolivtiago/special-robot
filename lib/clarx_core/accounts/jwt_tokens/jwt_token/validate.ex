@@ -5,7 +5,11 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken.Validate do
 
   @doc false
   def call(token, typ) when is_binary(token) and is_atom(typ) do
-    typ = Map.fetch!(typ_mappings(), typ)
+    typ =
+      JwtToken.Claims
+      |> Ecto.Enum.mappings(:typ)
+      |> Map.new()
+      |> Map.fetch!(typ)
 
     case JwtToken.Signer.verify_and_validate(token) do
       {:ok, %{"typ" => ^typ} = claims} ->
@@ -22,6 +26,4 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken.Validate do
         |> then(&{:error, &1})
     end
   end
-
-  defp typ_mappings, do: Ecto.Enum.mappings(JwtToken.Claims, :typ) |> Map.new()
 end

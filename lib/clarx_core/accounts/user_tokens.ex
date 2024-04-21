@@ -2,47 +2,48 @@ defmodule ClarxCore.Accounts.UserTokens do
   @moduledoc """
   Accounts.UserTokens context
   """
+
   alias ClarxCore.Accounts.UserTokens.UserToken
 
   @doc """
-  Gets an user token
+  Verifies an user token
 
   ## Examples
 
-      iex> get_user_token(field, value)
+      iex> verify_user_token(token, token_type)
       {:ok, %UserToken{}}
 
-      iex> get_user_token(field, bad_value)
+      iex> verify_user_token(bad_token, token_type)
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate get_user_token(field, value), to: UserToken.Get, as: :call
+  defdelegate verify_user_token(token, token_type), to: UserToken.Verify, as: :call
 
   @doc """
   Creates an user token
 
   ## Examples
 
-      iex> create_user_token(%{field: value})
+      iex> create_user_token(user, token_type)
       {:ok, %UserToken{}}
 
-      iex> create_user_token(%{field: bad_value})
+      iex> create_user_token(bad_user, token_type)
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate create_user_token(attrs), to: UserToken.Create, as: :call
+  defdelegate create_user_token(user, token_type), to: UserToken.Create, as: :call
 
   @doc """
-  Deletes an user token
+  Revokes an user token
 
   ## Examples
 
-      iex> delete_user_token(user_token)
+      iex> revoke_user_token(user_token)
       {:ok, %UserToken{}}
 
-      iex> delete_user_token(invalid_user_token)
+      iex> revoke_user_token(bad_user_token)
       {:error, %Ecto.Changeset{}}
 
   """
-  defdelegate delete_user_token(user_token), to: UserToken.Delete, as: :call
+  defdelegate revoke_user_token(user_token), to: UserToken.Revoke, as: :call
 end

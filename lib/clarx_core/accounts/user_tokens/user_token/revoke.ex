@@ -1,4 +1,4 @@
-defmodule ClarxCore.Accounts.UserTokens.UserToken.Delete do
+defmodule ClarxCore.Accounts.UserTokens.UserToken.Revoke do
   @moduledoc false
 
   alias ClarxCore.Accounts.UserTokens.UserToken
