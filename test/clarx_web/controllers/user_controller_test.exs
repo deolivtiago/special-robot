@@ -1,6 +1,7 @@
 defmodule ClarxWeb.UserControllerTest do
   use ClarxWeb.ConnCase, async: true
 
+  import ClarxCore.Accounts.JwtTokensFixtures
   import ClarxCore.Accounts.UsersFixtures
 
   @id_not_found Ecto.UUID.generate()
@@ -12,7 +13,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "index/2 returns success" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "with a list of users when there are users", %{conn: conn, user: user} do
       conn = get(conn, ~p"/api/users")
@@ -30,7 +31,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "create/2 returns success" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user parameters are valid", %{conn: conn} do
       user_params = user_attrs()
@@ -50,7 +51,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "create/2 returns error" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user parameters are invalid", %{conn: conn} do
       user_params = %{email: "", first_name: nil, confirmed_at: 1, password: "?", role: "invalid"}
@@ -68,7 +69,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "show/2 returns success" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user id is found", %{conn: conn, user: user} do
       conn = get(conn, ~p"/api/users/#{user}")
@@ -86,7 +87,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "show/2 returns error" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user id is not found", %{conn: conn} do
       conn = get(conn, ~p"/api/users/#{@id_not_found}")
@@ -98,7 +99,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "update/2 returns success" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user parameters are valid", %{conn: conn, user: user} do
       user_params = Map.delete(user_attrs(), :password)
@@ -118,7 +119,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "update/2 returns error" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user parameters are invalid", %{conn: conn, user: user} do
       user_params = %{email: "?@?", first_name: "", password: "?", role: 0, confirmed_at: 1}
@@ -136,7 +137,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "delete/2 returns success" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user is found", %{conn: conn, user: user} do
       conn = delete(conn, ~p"/api/users/#{user}")
@@ -146,7 +147,7 @@ defmodule ClarxWeb.UserControllerTest do
   end
 
   describe "delete/2 returns error" do
-    setup [:put_user]
+    setup [:put_user, :put_auth]
 
     test "when the user is not found", %{conn: conn} do
       conn = delete(conn, ~p"/api/users/#{@id_not_found}")
@@ -159,5 +160,16 @@ defmodule ClarxWeb.UserControllerTest do
 
   defp put_user(_) do
     {:ok, user: insert_user()}
+  end
+
+  defp put_auth(%{conn: conn}) do
+    bearer_token =
+      build_jwt_token()
+      |> Map.fetch!(:token)
+      |> then(&"Bearer #{&1}")
+
+    conn
+    |> put_req_header("authorization", bearer_token)
+    |> then(&{:ok, conn: &1})
   end
 end

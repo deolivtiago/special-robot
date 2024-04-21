@@ -13,8 +13,7 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken.Validate do
         |> Map.put(:token, token)
         |> Map.put(:claims, claims)
         |> JwtToken.changeset()
-        |> Ecto.Changeset.apply_action!(nil)
-        |> then(&{:ok, &1})
+        |> Ecto.Changeset.apply_action(nil)
 
       _error ->
         %JwtToken{}

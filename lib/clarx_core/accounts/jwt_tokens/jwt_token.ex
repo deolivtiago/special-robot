@@ -20,7 +20,7 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken do
       field :sub, :string
       field :exp, :integer
 
-      field :typ, Ecto.Enum, values: ~w(access refresh)a, default: :access
+      field :typ, Ecto.Enum, values: ~w(access refresh)a
 
       field :iss, :string, default: "clarx_server"
       field :aud, :string, default: "clarx_client"
@@ -36,7 +36,7 @@ defmodule ClarxCore.Accounts.JwtTokens.JwtToken do
     |> cast_embed(:claims, with: &claims_changeset/2, required: true)
   end
 
-  def claims_changeset(claims, attrs) when is_map(attrs) do
+  defp claims_changeset(claims, attrs) when is_map(attrs) do
     required_attrs = ~w(jti sub exp typ)a
     optional_attrs = ~w(iss aud iat nbf)a
 
