@@ -1,6 +1,6 @@
 defmodule ClarxCore.Accounts.AuthTokens.AuthToken.JwtToken do
   @moduledoc """
-  JWT Token schema
+  JWT Token
   """
   use Joken.Config
 
@@ -19,6 +19,8 @@ defmodule ClarxCore.Accounts.AuthTokens.AuthToken.JwtToken do
       %JwtToken{}
 
   """
+  def new!(sub, typ) when is_atom(typ), do: new!(sub, Atom.to_string(typ))
+
   def new!(sub, typ) when is_binary(sub) and typ in ~w(access refresh) do
     case generate_and_sign(%{"sub" => sub, "typ" => typ}) do
       {:ok, token, claims} ->
@@ -30,10 +32,37 @@ defmodule ClarxCore.Accounts.AuthTokens.AuthToken.JwtToken do
           type: Map.fetch!(claims, "typ"),
           expiration: DateTime.from_unix!(Map.fetch!(claims, "exp"), :second)
         }
-
-      _error ->
-        raise "token could't be signed"
     end
+  rescue
+    _error ->
+      raise "token could't be signed"
+  end
+
+  @doc """
+  Verifies a JWT token, raising on errors
+
+  ## Examples
+
+      iex> verify!(token, typ)
+      %JwtToken{}
+
+  """
+  def verify!(token, typ) when is_atom(typ), do: verify!(token, Atom.to_string(typ))
+
+  def verify!(token, typ) when is_binary(typ) do
+    case verify_and_validate(token) do
+      {:ok, %{"typ" => ^typ} = claims} ->
+        %JwtToken{
+          token: token,
+          claims: claims,
+          id: Map.fetch!(claims, "jti"),
+          sub: Map.fetch!(claims, "sub"),
+          type: Map.fetch!(claims, "typ"),
+          expiration: DateTime.from_unix!(Map.fetch!(claims, "exp"), :second)
+        }
+    end
+  rescue
+    _error -> raise "token is invalid"
   end
 
   add_hook(Joken.Hooks.RequiredClaims, ~w(jti typ sub exp)a)

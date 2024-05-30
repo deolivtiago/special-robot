@@ -4,7 +4,7 @@ defmodule ClarxWeb.AuthController do
 
   alias ClarxCore.Accounts.OtpCodes
   alias ClarxCore.Accounts.Users
-  alias ClarxCore.Accounts.UserTokens
+  alias ClarxCore.Accounts.AuthTokens
 
   action_fallback ClarxWeb.FallbackController
 
@@ -12,8 +12,8 @@ defmodule ClarxWeb.AuthController do
   def signup(conn, %{"user" => %{"email" => email} = user_params, "code" => code}) do
     with {:ok, otp_code} <- OtpCodes.verify_otp_code(code, email),
          {:ok, user} <- Users.create_user(user_params),
-         {:ok, access_token} <- UserTokens.create_user_token(user, :access),
-         {:ok, refresh_token} <- UserTokens.create_user_token(user, :refresh),
+         {:ok, access_token} <- AuthTokens.generate_auth_token(user, :access),
+         {:ok, refresh_token} <- AuthTokens.generate_auth_token(user, :refresh),
          {:ok, _otp_code} <- OtpCodes.revoke_otp_code(otp_code) do
       conn
       |> put_status(:created)
@@ -25,48 +25,48 @@ defmodule ClarxWeb.AuthController do
   @doc false
   def signin(conn, %{"credentials" => user_credentials}) do
     with {:ok, user} <- Users.authenticate_user(user_credentials),
-         {:ok, access_token} <- UserTokens.create_user_token(user, :access),
-         {:ok, refresh_token} <- UserTokens.create_user_token(user, :refresh) do
+         {:ok, access_token} <- AuthTokens.generate_auth_token(user, :access),
+         {:ok, refresh_token} <- AuthTokens.generate_auth_token(user, :refresh) do
       render(conn, :show, auth: %{access_token: access_token, refresh_token: refresh_token})
     end
   end
 
   @doc false
   def signout(conn, %{"access_token" => access_token, "refresh_token" => refresh_token}) do
-    with {:ok, user_token} <- UserTokens.verify_user_token(refresh_token, :refresh),
-         {:ok, _user_token} <- UserTokens.revoke_user_token(user_token),
-         {:ok, user_token} <- UserTokens.verify_user_token(access_token, :access),
-         {:ok, _user_token} <- UserTokens.revoke_user_token(user_token) do
+    with {:ok, auth_token} <- AuthTokens.validate_auth_token(refresh_token, :refresh),
+         {:ok, _auth_token} <- AuthTokens.revoke_auth_token(auth_token),
+         {:ok, auth_token} <- AuthTokens.validate_auth_token(access_token, :access),
+         {:ok, _auth_token} <- AuthTokens.revoke_auth_token(auth_token) do
       send_resp(conn, :no_content, "")
     end
   end
 
   def signout(conn, %{"refresh_token" => refresh_token}) do
-    with {:ok, user_token} <- UserTokens.verify_user_token(refresh_token, :refresh),
-         {:ok, _user_token} <- UserTokens.revoke_user_token(user_token) do
+    with {:ok, auth_token} <- AuthTokens.validate_auth_token(refresh_token, :refresh),
+         {:ok, _auth_token} <- AuthTokens.revoke_auth_token(auth_token) do
       send_resp(conn, :no_content, "")
     end
   end
 
   def signout(conn, %{"access_token" => access_token}) do
-    with {:ok, user_token} <- UserTokens.verify_user_token(access_token, :access),
-         {:ok, _user_token} <- UserTokens.revoke_user_token(user_token) do
+    with {:ok, auth_token} <- AuthTokens.validate_auth_token(access_token, :access),
+         {:ok, _auth_token} <- AuthTokens.revoke_auth_token(auth_token) do
       send_resp(conn, :no_content, "")
     end
   end
 
   @doc false
-  def renew(conn, %{"refresh_token" => refresh_token}) do
-    with {:ok, user_token} <- UserTokens.verify_user_token(refresh_token, :refresh),
-         {:ok, %{user: user}} <- UserTokens.revoke_user_token(user_token),
-         {:ok, access_token} <- UserTokens.create_user_token(user, :access),
-         {:ok, refresh_token} <- UserTokens.create_user_token(user, :refresh) do
+  def refresh(conn, %{"refresh_token" => refresh_token}) do
+    with {:ok, auth_token} <- AuthTokens.validate_auth_token(refresh_token, :refresh),
+         {:ok, %{user: user}} <- AuthTokens.revoke_auth_token(auth_token),
+         {:ok, access_token} <- AuthTokens.generate_auth_token(user, :access),
+         {:ok, refresh_token} <- AuthTokens.generate_auth_token(user, :refresh) do
       render(conn, :show, auth: %{access_token: access_token, refresh_token: refresh_token})
     end
   end
 
   @doc false
-  def reset(conn, %{"code" => code, "user" => %{"email" => email, "password" => password}}) do
+  def reset(conn, %{"code" => code, "credentials" => %{"email" => email, "password" => password}}) do
     with {:ok, otp_code} <- OtpCodes.verify_otp_code(code, email),
          {:ok, user} <- Users.get_user(:email, email),
          {:ok, _user} <- Users.update_user(user, %{password: password}),

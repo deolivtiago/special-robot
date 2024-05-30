@@ -1,11 +1,11 @@
-defmodule ClarxCore.Accounts.UserTokensTest do
+defmodule ClarxCore.Accounts.AuthTokensTest do
   use ClarxCore.DataCase, async: true
 
   import ClarxCore.Accounts.UsersFixtures
-  import ClarxCore.Accounts.UserTokensFixtures
+  import ClarxCore.Accounts.AuthTokensFixtures
 
-  alias ClarxCore.Accounts.UserTokens
-  alias ClarxCore.Accounts.UserTokens.UserToken
+  alias ClarxCore.Accounts.AuthTokens
+  alias ClarxCore.Accounts.AuthTokens.AuthToken
   alias Ecto.Changeset
 
   setup do
@@ -14,17 +14,17 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     |> then(&{:ok, attrs: &1})
   end
 
-  describe "get_user_token/2" do
-    setup [:put_user_token]
+  describe "get_auth_token/2" do
+    setup [:put_auth_token]
 
     test "returns ok when the given id is found", %{user_token: user_token} do
-      assert {:ok, user_token} == UserTokens.get_user_token(:id, user_token.id)
+      assert {:ok, user_token} == AuthTokens.get_auth_token(:id, user_token.id)
     end
 
     test "returns error when the given id is not found" do
       id = Ecto.UUID.generate()
 
-      assert {:error, changeset} = UserTokens.get_user_token(:id, id)
+      assert {:error, changeset} = AuthTokens.get_auth_token(:id, id)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -32,7 +32,7 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     end
 
     test "returns error when the given id is invalid" do
-      assert {:error, changeset} = UserTokens.get_user_token(:id, 1)
+      assert {:error, changeset} = AuthTokens.get_auth_token(:id, 1)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -40,13 +40,14 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     end
 
     test "raises when the error is not handled" do
-      assert_raise ArgumentError, fn -> UserTokens.get_user_token(:id, nil) end
+      assert_raise ArgumentError, fn -> AuthTokens.get_auth_token(:id, nil) end
     end
   end
 
-  describe "create_user_token/2 returns ok" do
+  describe "generate_auth_token/2 returns ok" do
     test "when the user attributes are valid", %{attrs: attrs} do
-      assert {:ok, %UserToken{} = user_token} = UserTokens.create_user_token(attrs.user, :access)
+      assert {:ok, %AuthToken{} = user_token} =
+               AuthTokens.generate_auth_token(attrs.user, :access)
 
       assert user_token.token == attrs.token
       assert user_token.type == attrs.type
@@ -56,11 +57,11 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     end
   end
 
-  describe "create_user_token/1 returns error" do
+  describe "generate_auth_token/1 returns error" do
     test "when the user token attributes are invalid" do
       attrs = %{user_id: "???", token: nil, expiration: 1, type: "invalid"}
 
-      assert {:error, changeset} = UserTokens.create_user_token(attrs)
+      assert {:error, changeset} = AuthTokens.generate_auth_token(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -71,9 +72,9 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     end
 
     test "when the user token already exists", %{attrs: attrs} do
-      attrs = Map.put(attrs, :token, insert_user_token(attrs.user).token)
+      attrs = Map.put(attrs, :token, insert_auth_token(attrs.user).token)
 
-      assert {:error, changeset} = UserTokens.create_user_token(attrs)
+      assert {:error, changeset} = AuthTokens.generate_auth_token(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -82,12 +83,12 @@ defmodule ClarxCore.Accounts.UserTokensTest do
   end
 
   describe "delete_user/1 returns" do
-    setup [:put_user_token]
+    setup [:put_auth_token]
 
     test "ok when the user is deleted", %{user_token: user_token} do
-      assert {:ok, %UserToken{}} = UserTokens.delete_user_token(user_token)
+      assert {:ok, %AuthToken{}} = AuthTokens.delete_auth_token(user_token)
 
-      assert {:error, changeset} = UserTokens.get_user_token(:id, user_token.id)
+      assert {:error, changeset} = AuthTokens.get_auth_token(:id, user_token.id)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -95,9 +96,9 @@ defmodule ClarxCore.Accounts.UserTokensTest do
     end
   end
 
-  defp put_user_token(%{attrs: %{user: user}}) do
+  defp put_auth_token(%{attrs: %{user: user}}) do
     user
-    |> insert_user_token()
+    |> insert_auth_token()
     |> then(&{:ok, user_token: &1})
   end
 end

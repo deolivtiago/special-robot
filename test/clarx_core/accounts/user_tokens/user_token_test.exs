@@ -1,10 +1,10 @@
-defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
+defmodule ClarxCore.Accounts.AuthTokens.AuthTokenTest do
   use ClarxCore.DataCase, async: true
 
   import ClarxCore.Accounts.UsersFixtures
-  import ClarxCore.Accounts.UserTokensFixtures
+  import ClarxCore.Accounts.AuthTokensFixtures
 
-  alias ClarxCore.Accounts.UserTokens.UserToken
+  alias ClarxCore.Accounts.AuthTokens.AuthToken
   alias Ecto.Changeset
 
   setup do
@@ -17,21 +17,21 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when id is valid", %{attrs: attrs} do
       attrs = Map.put(attrs, :id, String.upcase(attrs.id))
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
 
       assert %Changeset{valid?: true} = changeset
       assert Changeset.get_field(changeset, :id) == String.downcase(attrs.id)
     end
 
     test "when token is valid", %{attrs: attrs} do
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
 
       assert %Changeset{valid?: true} = changeset
       assert Changeset.get_field(changeset, :token) == attrs.token
     end
 
     test "when expiration is valid as datetime", %{attrs: attrs} do
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
 
       assert %Changeset{valid?: true} = changeset
       assert Changeset.get_field(changeset, :expiration) == attrs.expiration
@@ -40,14 +40,14 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when expiration is valid as string", %{attrs: attrs} do
       attrs = Map.put(attrs, :expiration, DateTime.to_iso8601(attrs.expiration))
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
 
       assert %Changeset{valid?: true, changes: changes} = changeset
       assert DateTime.to_iso8601(changes.expiration) == attrs.expiration
     end
 
     test "when type is valid", %{attrs: attrs} do
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
 
       assert %Changeset{valid?: true} = changeset
       assert Changeset.get_field(changeset, :type) == attrs.type
@@ -56,7 +56,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when user id is valid", %{attrs: attrs} do
       attrs = Map.put(attrs, :user_id, String.upcase(attrs.user_id))
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
 
       assert %Changeset{valid?: true} = changeset
       assert Changeset.get_field(changeset, :user_id) == String.downcase(attrs.user_id)
@@ -67,7 +67,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when id is empty", %{attrs: attrs} do
       attrs = Map.put(attrs, :id, nil)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -77,7 +77,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when id has invalid format", %{attrs: attrs} do
       attrs = Map.put(attrs, :id, "id.invalid")
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -87,7 +87,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when id is invalid", %{attrs: attrs} do
       attrs = Map.put(attrs, :id, 1)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -97,7 +97,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when user id is empty", %{attrs: attrs} do
       attrs = Map.put(attrs, :user_id, nil)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -107,7 +107,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when user id has invalid format", %{attrs: attrs} do
       attrs = Map.put(attrs, :user_id, "user_id.invalid")
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -117,7 +117,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when user id is invalid", %{attrs: attrs} do
       attrs = Map.put(attrs, :user_id, 1)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -127,7 +127,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when token is empty", %{attrs: attrs} do
       attrs = Map.put(attrs, :token, nil)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -137,7 +137,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when token is invalid", %{attrs: attrs} do
       attrs = Map.put(attrs, :token, 1)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -147,7 +147,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when expiration is empty", %{attrs: attrs} do
       attrs = Map.put(attrs, :expiration, nil)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -157,7 +157,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when expiration is invalid", %{attrs: attrs} do
       attrs = Map.put(attrs, :expiration, "invalid.expiration")
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -167,7 +167,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when type is empty", %{attrs: attrs} do
       attrs = Map.put(attrs, :type, nil)
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset
@@ -177,7 +177,7 @@ defmodule ClarxCore.Accounts.UserTokens.UserTokenTest do
     test "when type is invalid", %{attrs: attrs} do
       attrs = Map.put(attrs, :type, "invalid.type")
 
-      changeset = UserToken.changeset(attrs)
+      changeset = AuthToken.changeset(attrs)
       errors = errors_on(changeset)
 
       assert %Changeset{valid?: false} = changeset

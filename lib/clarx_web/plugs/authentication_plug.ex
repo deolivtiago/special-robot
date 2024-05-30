@@ -4,14 +4,14 @@ defmodule ClarxWeb.Plugs.AuthenticationPlug do
   """
   import Plug.Conn
 
-  alias ClarxCore.Accounts.UserTokens
+  alias ClarxCore.Accounts.AuthTokens
 
   @doc false
   def init(opts), do: opts
 
   @doc false
   def call(conn, _opts) do
-    case verify_auth_token(conn) do
+    case validate_auth_token(conn) do
       {:ok, %{user: user}} ->
         assign(conn, :current_user, user)
 
@@ -20,7 +20,7 @@ defmodule ClarxWeb.Plugs.AuthenticationPlug do
     end
   end
 
-  defp verify_auth_token(conn) do
+  defp validate_auth_token(conn) do
     bearer_prefix = ~r/^Bearer\s/
     type = token_type(conn.request_path)
 
@@ -29,7 +29,7 @@ defmodule ClarxWeb.Plugs.AuthenticationPlug do
     |> Enum.filter(&String.match?(&1, bearer_prefix))
     |> List.first("")
     |> String.replace(bearer_prefix, "")
-    |> UserTokens.verify_user_token(type)
+    |> AuthTokens.validate_auth_token(type)
   end
 
   defp token_type(request_path) do

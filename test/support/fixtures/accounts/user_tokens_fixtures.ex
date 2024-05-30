@@ -1,10 +1,10 @@
-defmodule ClarxCore.Accounts.UserTokensFixtures do
+defmodule ClarxCore.Accounts.AuthTokensFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `ClarxCore.Accounts.UserTokens` context.
+  entities via the `ClarxCore.Accounts.AuthTokens` context.
   """
   alias ClarxCore.Accounts.Users.User
-  alias ClarxCore.Accounts.UserTokens.UserToken
+  alias ClarxCore.Accounts.AuthTokens.AuthToken
   alias ClarxCore.Repo
   alias Ecto.Changeset
 
@@ -19,7 +19,7 @@ defmodule ClarxCore.Accounts.UserTokensFixtures do
   """
   def user_token_attrs(%User{} = user) do
     type =
-      UserToken
+      AuthToken
       |> Ecto.Enum.values(:type)
       |> Enum.random()
 
@@ -38,14 +38,14 @@ defmodule ClarxCore.Accounts.UserTokensFixtures do
 
     ## Examples
 
-      iex> build_user_token(user, %{field: value})
-      %UserToken{field: value, ...}
+      iex> build_auth_token(user, %{field: value})
+      %AuthToken{field: value, ...}
 
   """
-  def build_user_token(%User{} = user) do
+  def build_auth_token(%User{} = user) do
     user
     |> user_token_attrs()
-    |> UserToken.changeset()
+    |> AuthToken.changeset()
     |> Changeset.apply_action!(nil)
   end
 
@@ -54,14 +54,14 @@ defmodule ClarxCore.Accounts.UserTokensFixtures do
 
     ## Examples
 
-      iex> insert_user_token(user, %{field: value})
-      %UserToken{field: value, ...}
+      iex> insert_auth_token(user, %{field: value})
+      %AuthToken{field: value, ...}
 
   """
-  def insert_user_token(%User{} = user) do
+  def insert_auth_token(%User{} = user) do
     user
     |> user_token_attrs()
-    |> UserToken.changeset()
+    |> AuthToken.changeset()
     |> Repo.insert!()
     |> Repo.preload(:user)
   end

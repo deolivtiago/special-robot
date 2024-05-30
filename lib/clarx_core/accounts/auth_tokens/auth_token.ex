@@ -6,7 +6,6 @@ defmodule ClarxCore.Accounts.AuthTokens.AuthToken do
 
   import Ecto.Changeset
 
-  alias ClarxCore.Accounts.AuthTokens.AuthToken.JwtToken
   alias __MODULE__
 
   alias ClarxCore.Accounts.Users.User
@@ -38,17 +37,6 @@ defmodule ClarxCore.Accounts.AuthTokens.AuthToken do
     end
 
     timestamps(updated_at: false)
-  end
-
-  def changeset(user, typ) when is_atom(typ), do: changeset(user, Atom.to_string(typ))
-
-  def changeset(%User{id: sub}, typ) when typ in ~w(access refresh) do
-    token = JwtToken.new!(sub, typ)
-
-    token
-    |> Map.from_struct()
-    |> Map.put(:user_id, token.sub)
-    |> changeset()
   end
 
   def changeset(attrs) when is_map(attrs) do
