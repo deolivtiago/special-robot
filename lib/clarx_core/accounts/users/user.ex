@@ -8,6 +8,8 @@ defmodule ClarxCore.Accounts.Users.User do
 
   alias __MODULE__
 
+  alias ClarxCore.Accounts.AuthTokens.AuthToken
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   @timestamps_opts [type: :utc_datetime]
@@ -23,6 +25,8 @@ defmodule ClarxCore.Accounts.Users.User do
 
     field :role, Ecto.Enum, values: ~w(user admin)a, default: :user
     field :confirmed_at, :utc_datetime
+
+    has_many :auth_tokens, AuthToken
 
     timestamps()
   end

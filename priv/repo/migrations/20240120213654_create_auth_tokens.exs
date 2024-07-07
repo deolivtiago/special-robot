@@ -8,7 +8,6 @@ defmodule ClarxCore.Repo.Migrations.CreateAuthTokens do
       add :token, :text, null: false
       add :expiration, :timestamptz, null: false
       add :type, :string, null: false
-      add :claims, :map, null: false
 
       add :user_id,
           references(:users, on_delete: :delete_all, on_update: :update_all, type: :binary_id),

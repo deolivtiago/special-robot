@@ -5,6 +5,7 @@
     "lib/clarx_web.ex",
     "lib/clarx_web/router.ex",
     "lib/clarx_web/telemetry.ex",
+    "lib/clarx_core/accounts/json_web_tokens/json_web_token/signer.ex",
     "lib/clarx_web/views/error_json.ex"
   ],
   "terminal_options": {

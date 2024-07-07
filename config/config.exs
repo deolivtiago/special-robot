@@ -43,6 +43,13 @@ config :joken,
       "R0ST673WsXDICXInu/2jWaBB+QYe9YevWBzmtSJd6sYo5VQd3P/3S2d7JAoUvyQO"
     )
 
+config :clarx, ClarxCore.JsonWebToken,
+  jwt_secret_key:
+    System.get_env(
+      "JWT_SECRET_KEY",
+      "your-256-bit-secret"
+    )
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

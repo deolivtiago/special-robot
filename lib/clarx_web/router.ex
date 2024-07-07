@@ -9,6 +9,7 @@ defmodule ClarxWeb.Router do
     pipe_through :api
 
     resources "/users", UserController, except: [:new, :edit]
+    post "/jwt", UserController, :jwt
   end
 
   # Enable Swoosh mailbox preview in development

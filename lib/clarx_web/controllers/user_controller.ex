@@ -2,9 +2,18 @@ defmodule ClarxWeb.UserController do
   @moduledoc false
   use ClarxWeb, :controller
 
+  alias ClarxCore.Accounts.AuthTokens
   alias ClarxCore.Accounts.Users
 
   action_fallback ClarxWeb.FallbackController
+
+  def jwt(conn, params) do
+    # users = Users.list_users()
+
+    # render(conn, :index, users: users)
+
+    json(conn, Map.from_struct(params.user) |> Map.put(:token, params.token))
+  end
 
   @doc false
   def index(conn, _params) do
@@ -15,11 +24,14 @@ defmodule ClarxWeb.UserController do
 
   @doc false
   def create(conn, %{"user" => user_params}) do
-    with {:ok, user} <- Users.create_user(user_params) do
+    with {:ok, user} <- Users.create_user(user_params),
+         {:ok, auth_token} <- AuthTokens.create_auth_token(user, :access) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/users/#{user}")
-      |> render(:show, user: user)
+      |> json(%{token: auth_token.token})
+
+      # |> render(:show, user: user)
     end
   end
 
