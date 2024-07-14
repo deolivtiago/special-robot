@@ -35,6 +35,14 @@ config :clarx, ClarxCore.Mailer, adapter: Swoosh.Adapters.Local
 # Configures the database timezone
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
+# Configures JWT secret key
+config :clarx, ClarxCore.JsonWebToken,
+  jwt_secret_key:
+    System.get_env(
+      "JWT_SECRET_KEY",
+      "R0ST673WsXDICXInu/2jWaBB+QYe9YevWBzmtSJd6sYo5VQd3P/3S2d7JAoUvyQO"
+    )
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
